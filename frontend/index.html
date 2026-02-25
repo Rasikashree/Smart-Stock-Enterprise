@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartStock Enterprise - Grocery in 7 Minutes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <h1 class="logo">🛒 SmartStock</h1>
+                </div>
+                <div class="col">
+                    <div id="userInfo" class="text-muted">
+                        <span id="userName">Login</span> | <span id="userLocation">Fetching...</span>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <a href="cart.html" class="btn btn-outline-danger">
+                        <i class="bi bi-cart-fill"></i> Cart <span id="cartBadge" class="badge bg-danger">0</span>
+                    </a>
+                    <a href="orders.html" class="btn btn-outline-success">
+                        <i class="bi bi-bag-check"></i> My Orders
+                    </a>
+                    <button class="btn btn-outline-secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- OTP Login Modal -->
+    <div class="modal fade" id="otpModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Login with OTP</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <input type="tel" class="form-control" id="phoneInput" placeholder="9876543210">
+                        <label for="phoneInput">Phone Number</label>
+                    </div>
+                    <div id="otpSection" style="display:none;">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="otpInput" placeholder="000000" maxlength="6">
+                            <label for="otpInput">OTP (6 digits)</label>
+                        </div>
+                        <div id="otpTimer" class="text-center text-muted small mb-3">Resend in <span id="timerCount">30</span>s</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="sendOtpBtn" class="btn btn-danger" onclick="sendOTP()">Send OTP</button>
+                    <button type="button" id="verifyOtpBtn" class="btn btn-success" onclick="verifyOTP()" style="display:none;">Verify & Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories Carousel -->
+    <section class="categories-section">
+        <div class="container-fluid">
+            <h6 class="mb-3 fw-bold">Popular Categories</h6>
+            <div class="categories-carousel" id="categoriesCarousel">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container-fluid py-4">
+        <div class="row">
+            <!-- Sidebar - Categories -->
+            <div class="col-lg-3 d-none d-lg-block">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h6 class="mb-0">Categories</h6>
+                    </div>
+                    <ul class="list-group list-group-flush" id="categoriesList">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="col-lg-9">
+                <div class="row" id="productsGrid">
+                    <!-- Populated by JS -->
+                </div>
+                <div id="loadingSpinner" class="text-center">
+                    <div class="spinner-border text-danger" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p>&copy; 2026 SmartStock Enterprise. Grocery in 7 Minutes.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Auto-show login modal if not authenticated
+        window.addEventListener('load', () => {
+            if (!localStorage.getItem('userPhone')) {
+                const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+                otpModal.show();
+            } else {
+                loadCart();  // ← ADDED: Load cart from sessionStorage first
+                loadProducts();
+                updateCartBadge();
+            }
+        });
+    </script>
+</body>
+</html>

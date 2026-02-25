@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - SmartStock Enterprise</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <h1 class="logo">🛒 SmartStock</h1>
+                </div>
+                <div class="col">
+                    <div id="userInfo" class="text-muted">
+                        <span id="userName">My Orders</span>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <a href="index.html" class="btn btn-outline-danger">
+                        <i class="bi bi-shop"></i> Shop
+                    </a>
+                    <button class="btn btn-outline-secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="row">
+            <div class="col-lg-10 offset-lg-1">
+                <h2 style="color: var(--primary-color); margin-bottom: 2rem;">
+                    <i class="bi bi-bag-check"></i> My Orders
+                </h2>
+
+                <!-- Orders List -->
+                <div id="ordersList"></div>
+
+                <!-- Empty State -->
+                <div id="emptyOrders" class="text-center py-5" style="display: none;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+                    <h4 style="color: var(--dark-text);">No Orders Yet</h4>
+                    <p style="color: #999; margin-bottom: 2rem;">You haven't placed any orders yet</p>
+                    <a href="index.html" class="btn" style="background: var(--primary-color); color: white;">
+                        <i class="bi bi-shop"></i> Start Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p>&copy; 2026 SmartStock Enterprise. Grocery in 7 Minutes.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('allOrders') || '[]');
+            const ordersList = document.getElementById('ordersList');
+            const emptyOrders = document.getElementById('emptyOrders');
+
+            if (orders.length === 0) {
+                emptyOrders.style.display = 'block';
+                ordersList.innerHTML = '';
+                return;
+            }
+
+            emptyOrders.style.display = 'none';
+
+            ordersList.innerHTML = orders.map((order, idx) => `
+                <div class="card mb-3" style="border-left: 4px solid var(--primary-color);">
+                    <div class="card-header" style="background: var(--light-bg); border: none;">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 style="color: var(--primary-color); margin: 0; font-weight: 700;">
+                                    Order #${order.orderId}
+                                </h6>
+                                <small style="color: #999;">${order.date}</small>
+                            </div>
+                            <div class="col-auto">
+                                <span class="badge" style="background: var(--secondary-color); padding: 0.5rem 1rem; font-size: 0.9rem;">
+                                    <i class="bi bi-check-circle"></i> ${order.status}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h6 style="color: var(--dark-accent); margin-bottom: 1rem;">Items:</h6>
+                        <div style="background: var(--light-bg); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                            <ul style="margin: 0; padding-left: 1.5rem;">
+                                ${order.items.map(item => `
+                                    <li style="margin-bottom: 0.5rem;">
+                                        <strong>${item.productName}</strong> (x${item.quantity})
+                                        <span style="float: right; color: var(--primary-color); font-weight: 600;">
+                                            ₹${item.total.toFixed(2)}
+                                        </span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 style="color: var(--dark-accent); margin-bottom: 0.75rem;">Delivery Address:</h6>
+                                <p style="margin: 0; font-size: 0.9rem;">
+                                    <strong>${order.customer.name}</strong><br>
+                                    ${order.customer.address}<br>
+                                    ${order.customer.city} - ${order.customer.postalCode}<br>
+                                    <i class="bi bi-telephone"></i> ${order.customer.phone}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <div style="border: 2px solid var(--primary-color); border-radius: 0.5rem; padding: 1rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span>Subtotal:</span>
+                                        <strong>₹${order.totals.subtotal.toFixed(2)}</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span>Tax (5%):</span>
+                                        <strong>₹${order.totals.tax.toFixed(2)}</strong>
+                                    </div>
+                                    <div style="border-top: 1px solid var(--primary-color); padding-top: 0.5rem; display: flex; justify-content: space-between;">
+                                        <span><strong>Total:</strong></span>
+                                        <strong style="color: var(--primary-color); font-size: 1.1rem;">₹${order.totals.total.toFixed(2)}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.5rem;">
+                            <span class="badge" style="background: var(--secondary-color);">
+                                <i class="bi bi-credit-card"></i> ${order.paymentMethod}
+                            </span>
+                            <span class="badge" style="background: var(--secondary-color);">
+                                <i class="bi bi-check-circle"></i> ${order.paymentStatus}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function logout() {
+            localStorage.removeItem('userPhone');
+            window.location.href = 'index.html';
+        }
+
+        // Load orders when page loads
+        window.addEventListener('load', () => {
+            if (!localStorage.getItem('userPhone')) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const phone = localStorage.getItem('userPhone');
+            document.getElementById('userName').textContent = phone;
+            loadOrders();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - SmartStock</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="logo mb-0"><i class="bi bi-gear"></i> Admin Dashboard</h1>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-outline-secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container-fluid py-4">
+        <!-- KPI Cards -->
+        <div class="row mb-4">
+            <div class="col-sm-6 col-lg-3 mb-3">
+                <div class="card border-left-danger">
+                    <div class="card-body">
+                        <h6 class="card-subtitle text-muted">Active Locks</h6>
+                        <h3 class="card-title text-danger" id="activeLocks">0</h3>
+                        <small class="text-muted">products reserved</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3 mb-3">
+                <div class="card border-left-warning">
+                    <div class="card-body">
+                        <h6 class="card-subtitle text-muted">Low Stock &lt;10</h6>
+                        <h3 class="card-title text-warning" id="lowStockCount">0</h3>
+                        <small class="text-muted">products</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3 mb-3">
+                <div class="card border-left-success">
+                    <div class="card-body">
+                        <h6 class="card-subtitle text-muted">Today Orders</h6>
+                        <h3 class="card-title text-success" id="todayOrders">0</h3>
+                        <small class="text-muted">completed</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3 mb-3">
+                <div class="card border-left-info">
+                    <div class="card-body">
+                        <h6 class="card-subtitle text-muted">Total Revenue</h6>
+                        <h3 class="card-title text-info" id="totalRevenue">₹0</h3>
+                        <small class="text-muted">today</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Add Product -->
+            <div class="col-lg-4 mb-4">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Add New Product</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="addProductForm">
+                            <div class="mb-3">
+                                <label class="form-label">Product Name *</label>
+                                <input type="text" class="form-control" id="productName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Category *</label>
+                                <select class="form-select" id="productCategory" required>
+                                    <option value="groceries">Groceries</option>
+                                    <option value="dairy">Dairy</option>
+                                    <option value="bakery">Bakery</option>
+                                    <option value="snacks">Snacks</option>
+                                    <option value="beverages">Beverages</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Price (₹) *</label>
+                                <input type="number" class="form-control" id="productPrice" step="0.01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Stock Quantity *</label>
+                                <input type="number" class="form-control" id="productStock" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Image URL</label>
+                                <input type="url" class="form-control" id="productImage" placeholder="https://...">
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="flashSale">
+                                <label class="form-check-label" for="flashSale">
+                                    Flash Sale
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-danger w-100">Add Product</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Refill Stock -->
+            <div class="col-lg-4 mb-4">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="bi bi-arrow-repeat"></i> Refill Stock</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="refillForm">
+                            <div class="mb-3">
+                                <label class="form-label">Select Product *</label>
+                                <select class="form-select" id="refillProduct" required>
+                                    <option value="">Choose product...</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Add Quantity *</label>
+                                <input type="number" class="form-control" id="refillQty" min="1" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Reason</label>
+                                <textarea class="form-control" id="refillReason" rows="2"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-warning w-100">Refill Stock</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            <div class="col-lg-4 mb-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-bell"></i> Recent Activity</h5>
+                    </div>
+                    <div id="activityLog" class="list-group list-group-flush">
+                        <!-- Activity logged here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Table -->
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-list-check"></i> Inventory Management</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Locked</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTable">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Active Locks Table -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> Active Smart Locks</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Phone</th>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Expires In</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="locksTable">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p>&copy; 2026 SmartStock Enterprise. Admin Dashboard.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            const adminPhone = localStorage.getItem('adminPhone');
+            if (!adminPhone) {
+                window.location.href = 'index.html';
+            }
+            loadAdminDashboard();
+            setInterval(refreshAdminData, 30000); // Refresh every 30s
+        });
+    </script>
+</body>
+</html>

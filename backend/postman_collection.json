@@ -1,0 +1,384 @@
+{
+  "info": {
+    "_postman_id": "smartstock-collection",
+    "name": "SmartStock Enterprise API",
+    "description": "Complete API collection for SmartStock Enterprise with 7-minute atomic locking",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Send OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"9876543210\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/otp/send",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "otp", "send"]
+            }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"9876543210\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/otp/verify",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "otp", "verify"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/products",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "products"]
+            }
+          }
+        },
+        {
+          "name": "Get Products by Category",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/products?category=groceries",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "products"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "groceries"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Product",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/products/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "products", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Shopping Cart - Smart Locking",
+      "item": [
+        {
+          "name": "Add to Cart (Stock >= 10)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"9876543210\",\n  \"productId\": 1,\n  \"quantity\": 2\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/cart/add",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "cart", "add"]
+            },
+            "description": "When stock >= 10: Normal add (no lock), frontend handles"
+          }
+        },
+        {
+          "name": "Add to Cart (Stock < 10) - ATOMIC LOCK",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"9876543210\",\n  \"productId\": 11,\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/cart/add",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "cart", "add"]
+            },
+            "description": "When stock < 10: Creates 7-min atomic lock, returns lockId"
+          }
+        },
+        {
+          "name": "Get Active Locks for User",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/cart?phone=9876543210",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "cart"],
+              "query": [
+                {
+                  "key": "phone",
+                  "value": "9876543210"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Remove Locked Item",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "http://localhost:8080/api/cart/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "cart", "1"]
+            }
+          }
+        },
+        {
+          "name": "Extend Lock +7 Minutes",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://localhost:8080/api/cart/extend/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "cart", "extend", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders & Checkout",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"9876543210\",\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"qty\": 2\n    },\n    {\n      \"productId\": 2,\n      \"qty\": 1\n    }\n  ],\n  \"locks\": [1],\n  \"total\": 450.00\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/orders",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "orders"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments - Razorpay",
+      "item": [
+        {
+          "name": "Create Razorpay Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": 1,\n  \"amount\": 450.00,\n  \"phone\": \"9876543210\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/payments/razorpay",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "payments", "razorpay"]
+            }
+          }
+        },
+        {
+          "name": "Verify Razorpay Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razorpayPaymentId\": \"pay_29QQoUBi66xm2f\",\n  \"razorpayOrderId\": \"order_9A33XWu170gUtm\",\n  \"razorpaySignature\": \"9ef4dffbfd84f1318f6739a3ce19f9d85851857ae648f114332d8401e0949a3d\",\n  \"orderId\": 1\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/payments/verify",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "payments", "verify"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard KPIs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/admin/dashboard",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "admin", "dashboard"]
+            }
+          }
+        },
+        {
+          "name": "Add New Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Product\",\n  \"price\": 299.99,\n  \"stock\": 50,\n  \"category\": \"groceries\",\n  \"imageUrl\": \"https://via.placeholder.com/200?text=Product\",\n  \"isFlashSale\": false\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/admin/products",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "admin", "products"]
+            }
+          }
+        },
+        {
+          "name": "Refill Stock",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"adminPhone\": \"9999999999\",\n  \"productId\": 1,\n  \"qty_change\": 20,\n  \"reason\": \"Manual refill - warehouse delivery\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/admin/refill",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "admin", "refill"]
+            }
+          }
+        },
+        {
+          "name": "Get Active Locks (Admin)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/admin/locks",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "admin", "locks"]
+            }
+          }
+        },
+        {
+          "name": "Get Activity Log",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/admin/activity?limit=20",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "admin", "activity"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

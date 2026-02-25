@@ -1,0 +1,29 @@
+{
+  "name": "smartstock-enterprise-frontend",
+  "version": "1.0.0",
+  "description": "Production-ready Zepto-like grocery app with 7-minute atomic locking",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server -p 3000",
+    "dev": "python -m http.server 3000",
+    "serve": "npx http-server -p 3000 -c-1",
+    "build": "echo 'Static site - no build needed'",
+    "test": "echo 'Run tests in Postman collection'"
+  },
+  "keywords": [
+    "grocery",
+    "delivery",
+    "zepto",
+    "locking",
+    "atomic",
+    "ecommerce"
+  ],
+  "author": "SmartStock Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.0"
+  }
+}
