@@ -1,0 +1,38 @@
+# ─── Secrets & Credentials ───────────────────────────────────
+.env
+.env.*
+backend/.env
+!.env.example
+
+# ─── Java Compiled Files ─────────────────────────────────────
+*.class
+*.jar
+!backend/lib/*.jar
+backend/target/
+backend/TestConn*.java
+backend/TestConn*.class
+backend/TestConnection*.java
+backend/TestConnection*.class
+backend/connection_test.log
+backend/result.txt
+backend/products_response.txt
+backend/server.log
+dependency-reduced-pom.xml
+
+# ─── Node Modules ─────────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+
+# ─── IDE / Editor ─────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# ─── Logs ────────────────────────────────────────────────────
+*.log
+logs/
+
+# ─── OS Files ────────────────────────────────────────────────
+Desktop.ini

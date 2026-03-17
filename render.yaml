@@ -1,0 +1,29 @@
+# ──────────────────────────────────────────────────────────────
+#  SmartStock Enterprise – Render.com Deployment Blueprint
+#  Docs: https://render.com/docs/blueprint-spec
+# ──────────────────────────────────────────────────────────────
+services:
+  - type: web
+    name: smartstock-enterprise-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: singapore     # closest to ap-south-1 (Mumbai)
+
+    # Health check endpoint
+    healthCheckPath: /api/health
+
+    # Environment variables (sensitive ones set via Render dashboard)
+    envVars:
+      - key: DB_HOST
+        value: aws-1-ap-south-1.pooler.supabase.com
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_NAME
+        value: postgres
+      - key: DB_USER
+        value: postgres.iucuspicdbqutdphfamc
+      - key: DB_PASSWORD
+        sync: false            # Will be set manually in Render dashboard
+      - key: SERVER_PORT
+        value: "8080"

@@ -1,6 +1,14 @@
 // SmartStock Enterprise - Frontend JavaScript
-// API Base URL
-const API_BASE = 'http://localhost:8080/api';
+// API Base URL - auto-detects production vs local
+const API_BASE = (() => {
+    const host = window.location.hostname;
+    // Running on Netlify or any non-localhost domain → use Render backend
+    if (host !== 'localhost' && host !== '127.0.0.1') {
+        return 'https://smartstock-enterprise-backend.onrender.com/api';
+    }
+    // Local development
+    return 'http://localhost:8080/api';
+})();
 const RAZORPAY_KEY = 'rzp_test_YOUR_TEST_KEY'; // Replace with actual test key
 
 // ==================== AUTHENTICATION ====================
