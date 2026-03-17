@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartStock Diagnostic</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: rgba(255,255,255,0.95); 
+            padding: 30px; 
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        h1 { color: #d32f2f; margin-bottom: 10px; }
+        h2 { color: #666; font-size: 18px; margin-top: 30px; border-bottom: 2px solid #d32f2f; padding-bottom: 10px; }
+        .test-section { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+        button { 
+            background: #d32f2f; 
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 14px;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        button:hover { background: #b71c1c; transform: translateY(-2px); }
+        .status { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 6px; 
+            font-size: 14px;
+        }
+        .success { background: #d4edda; border-left: 4px solid #28a745; color: #155724; }
+        .error { background: #f8d7da; border-left: 4px solid #dc3545; color: #721c24; }
+        .info { background: #d1ecf1; border-left: 4px solid #17a2b8; color: #0c5460; }
+        .log { 
+            background: #2d2d2d; 
+            color: #0f0; 
+            padding: 15px; 
+            border-radius: 6px; 
+            font-family: 'Courier New', monospace; 
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .log div { margin: 3px 0; }
+        .test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+        input { 
+            padding: 10px; 
+            border: 2px solid #ddd; 
+            border-radius: 6px; 
+            width: 200px;
+            font-size: 14px;
+        }
+        .badge { 
+            display: inline-block; 
+            padding: 3px 8px; 
+            border-radius: 12px; 
+            font-size: 11px; 
+            font-weight: bold;
+        }
+        .badge-success { background: #28a745; color: white; }
+        .badge-error { background: #dc3545; color: white; }
+        .badge-warning { background: #ffc107; color: #000; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 SmartStock Enterprise - System Diagnostic</h1>
+        <p style="color: #666;">Complete system health check and login flow test</p>
+
+        <h2>📡 System Status</h2>
+        <div class="test-section">
+            <div class="test-grid">
+                <button onclick="checkBackend()">Check Backend (8080)</button>
+                <button onclick="checkFrontend()">Check Frontend (3000)</button>
+                <button onclick="checkBoth()">Check Both Servers</button>
+            </div>
+            <div id="system-status"></div>
+        </div>
+
+        <h2>🔐 Authentication Flow Test</h2>
+        <div class="test-section">
+            <input type="text" id="phone" value="9442290033" placeholder="Phone Number">
+            <button onclick="testOTPSend()">1️⃣ Send OTP</button>
+            <button onclick="testOTPVerify()">2️⃣ Verify OTP (123456)</button>
+            <button onclick="testFullLogin()">🚀 Full Login Flow</button>
+            <div id="auth-status"></div>
+        </div>
+
+        <h2>📦 Data APIs Test</h2>
+        <div class="test-section">
+            <div class="test-grid">
+                <button onclick="testProducts()">Get All Products</button>
+                <button onclick="testCategories()">Get by Category</button>
+                <button onclick="testCart()">Test Cart API</button>
+            </div>
+            <div id="data-status"></div>
+        </div>
+
+        <h2>📊 Console Log</h2>
+        <div class="log" id="console-log"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        let logCount = 0;
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('console-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            
+            let color = '#0f0';
+            if (type === 'error') color = '#f44';
+            if (type === 'success') color = '#0f0';
+            if (type === 'warning') color = '#fa0';
+            
+            logEntry.innerHTML = `<span style="color:${color}">[${timestamp}]</span> ${message}`;
+            logDiv.insertBefore(logEntry, logDiv.firstChild);
+            
+            logCount++;
+            if (logCount > 100) {
+                logDiv.removeChild(logDiv.lastChild);
+            }
+        }
+
+        async function checkBackend() {
+            log('🔍 Checking backend on port 8080...');
+            const statusDiv = document.getElementById('system-status');
+            statusDiv.innerHTML = '<div class="status info">Testing backend...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                statusDiv.innerHTML = `
+                    <div class="status success">
+                        <strong>✅ Backend is ONLINE</strong><br>
+                        Status: ${data.status}<br>
+                        Database: ${data.database}<br>
+                        Port: ${data.port}
+                    </div>
+                `;
+                log('✅ Backend responding correctly', 'success');
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        <strong>❌ Backend is OFFLINE</strong><br>
+                        Error: ${error.message}<br>
+                        Make sure Java backend is running on port 8080
+                    </div>
+                `;
+                log('❌ Backend check failed: ' + error.message, 'error');
+            }
+        }
+
+        async function checkFrontend() {
+            log('🔍 Checking frontend on port 3000...');
+            const statusDiv = document.getElementById('system-status');
+            statusDiv.innerHTML = '<div class="status info">Testing frontend...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:3000/');
+                
+                if (response.ok) {
+                    statusDiv.innerHTML = `
+                        <div class="status success">
+                            <strong>✅ Frontend is ONLINE</strong><br>
+                            Status Code: ${response.status}<br>
+                            Server is serving files correctly
+                        </div>
+                    `;
+                    log('✅ Frontend responding correctly', 'success');
+                } else {
+                    throw new Error('Status ' + response.status);
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        <strong>❌ Frontend is OFFLINE</strong><br>
+                        Error: ${error.message}<br>
+                        Make sure http-server is running on port 3000
+                    </div>
+                `;
+                log('❌ Frontend check failed: ' + error.message, 'error');
+            }
+        }
+
+        async function checkBoth() {
+            await checkBackend();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await checkFrontend();
+        }
+
+        async function testOTPSend() {
+            const phone = document.getElementById('phone').value;
+            log(`📱 Sending OTP to ${phone}...`);
+            const statusDiv = document.getElementById('auth-status');
+            statusDiv.innerHTML = '<div class="status info">Sending OTP...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/otp/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    statusDiv.innerHTML = `
+                        <div class="status success">
+                            <strong>✅ OTP Sent Successfully</strong><br>
+                            ${data.message}<br>
+                            <span class="badge badge-success">STEP 1 COMPLETE</span>
+                        </div>
+                    `;
+                    log('✅ OTP sent: ' + data.message, 'success');
+                } else {
+                    throw new Error('OTP send failed');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        <strong>❌ OTP Send Failed</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+                log('❌ OTP send error: ' + error.message, 'error');
+            }
+        }
+
+        async function testOTPVerify() {
+            const phone = document.getElementById('phone').value;
+            log(`🔐 Verifying OTP for ${phone}...`);
+            const statusDiv = document.getElementById('auth-status');
+            statusDiv.innerHTML = '<div class="status info">Verifying OTP...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/otp/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, otp: '123456' })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    statusDiv.innerHTML = `
+                        <div class="status success">
+                            <strong>✅ OTP Verified Successfully</strong><br>
+                            Token: ${data.token.substring(0, 30)}...<br>
+                            Admin: ${data.isAdmin}<br>
+                            <span class="badge badge-success">STEP 2 COMPLETE</span>
+                        </div>
+                    `;
+                    log('✅ OTP verified, token received', 'success');
+                    localStorage.setItem('userPhone', phone);
+                    localStorage.setItem('userToken', data.token);
+                } else {
+                    throw new Error('Invalid OTP');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        <strong>❌ OTP Verification Failed</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+                log('❌ OTP verify error: ' + error.message, 'error');
+            }
+        }
+
+        async function testFullLogin() {
+            log('🚀 Starting full login flow...', 'warning');
+            await testOTPSend();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testOTPVerify();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testProducts();
+            log('✅ Full login flow complete!', 'success');
+        }
+
+        async function testProducts() {
+            log('📦 Fetching products...');
+            const statusDiv = document.getElementById('data-status');
+            statusDiv.innerHTML = '<div class="status info">Loading products...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/products`);
+                const data = await response.json();
+                
+                statusDiv.innerHTML = `
+                    <div class="status success">
+                        <strong>✅ Products Loaded</strong><br>
+                        Total: ${data.length} items<br>
+                        Sample: ${data[0].name} - ₹${data[0].price}<br>
+                        Categories: ${[...new Set(data.map(p => p.category))].join(', ')}
+                    </div>
+                `;
+                log(`✅ Loaded ${data.length} products`, 'success');
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        <strong>❌ Products Load Failed</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+                log('❌ Products error: ' + error.message, 'error');
+            }
+        }
+
+        async function testCategories() {
+            log('📦 Fetching vegetables category...');
+            const statusDiv = document.getElementById('data-status');
+            statusDiv.innerHTML = '<div class="status info">Loading category...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/products?category=Vegetables`);
+                const data = await response.json();
+                
+                statusDiv.innerHTML = `
+                    <div class="status success">
+                        <strong>✅ Category Loaded</strong><br>
+                        Vegetables: ${data.length} items<br>
+                        ${data.map(p => p.name).join(', ')}
+                    </div>
+                `;
+                log(`✅ Loaded ${data.length} vegetables`, 'success');
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        <strong>❌ Category Load Failed</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+                log('❌ Category error: ' + error.message, 'error');
+            }
+        }
+
+        async function testCart() {
+            log('🛒 Testing cart API...');
+            const statusDiv = document.getElementById('data-status');
+            const phone = document.getElementById('phone').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/cart?phone=${phone}`);
+                const data = await response.json();
+                
+                statusDiv.innerHTML = `
+                    <div class="status success">
+                        <strong>✅ Cart API Working</strong><br>
+                        Cart items: ${data.count}<br>
+                        Response: ${JSON.stringify(data)}
+                    </div>
+                `;
+                log('✅ Cart API responded', 'success');
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        <strong>❌ Cart API Failed</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+                log('❌ Cart error: ' + error.message, 'error');
+            }
+        }
+
+        // Auto-run on page load
+        window.onload = () => {
+            log('🔧 Diagnostic page loaded', 'warning');
+            log('Click buttons above to test each component');
+            checkBoth();
+        };
+    </script>
+</body>
+</html>

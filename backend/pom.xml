@@ -19,7 +19,7 @@
     </properties>
 
     <dependencies>
-        <!-- PostgreSQL JDBC Driver -->
+        <!-- PostgreSQL JDBC Driver for Supabase -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>

@@ -6,31 +6,42 @@ const RAZORPAY_KEY = 'rzp_test_YOUR_TEST_KEY'; // Replace with actual test key
 // ==================== AUTHENTICATION ====================
 async function sendOTP() {
     const phone = document.getElementById('phoneInput').value;
+    console.log('[SmartStock] Sending OTP for phone:', phone);
+    
     if (!phone || phone.length !== 10) {
+        console.error('[SmartStock] Invalid phone number:', phone);
         alert('Please enter a valid 10-digit phone number');
         return;
     }
 
     try {
+        console.log('[SmartStock] Calling API:', `${API_BASE}/otp/send`);
         const response = await fetch(`${API_BASE}/otp/send`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ phone })
         });
 
-        if (response.ok) {
+        console.log('[SmartStock] OTP Response status:', response.status);
+        const data = await response.json();
+        console.log('[SmartStock] OTP Response data:', data);
+
+        if (response.ok && data.success) {
             localStorage.setItem('tempPhone', phone);
             document.getElementById('sendOtpBtn').style.display = 'none';
             document.getElementById('otpSection').style.display = 'block';
             document.getElementById('verifyOtpBtn').style.display = 'block';
+            document.getElementById('otpTimer').style.display = 'block';
             startOTPTimer();
-            alert('OTP sent to your phone (Demo: use 123456)');
+            console.log('[SmartStock] OTP UI updated, showing OTP field');
+            alert(data.message || 'OTP sent! Use 123456 for demo');
         } else {
-            alert('Failed to send OTP');
+            console.error('[SmartStock] OTP send failed:', data);
+            alert('Failed to send OTP. Please try again.');
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('Error: ' + error.message);
+        console.error('[SmartStock] OTP Error:', error);
+        alert('Network Error: ' + error.message + '\n\nMake sure backend is running on port 8080');
     }
 }
 
@@ -52,40 +63,54 @@ function startOTPTimer() {
 async function verifyOTP() {
     const phone = localStorage.getItem('tempPhone');
     const otp = document.getElementById('otpInput').value;
+    console.log('[SmartStock] Verifying OTP for phone:', phone, 'OTP:', otp);
 
     if (!otp || otp.length !== 6) {
+        console.error('[SmartStock] Invalid OTP length:', otp);
         alert('Please enter a valid 6-digit OTP');
         return;
     }
 
     try {
+        console.log('[SmartStock] Calling API:', `${API_BASE}/otp/verify`);
         const response = await fetch(`${API_BASE}/otp/verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ phone, otp })
         });
 
-        if (response.ok) {
-            const data = await response.json();
+        console.log('[SmartStock] Verify Response status:', response.status);
+        const data = await response.json();
+        console.log('[SmartStock] Verify Response data:', data);
+
+        if (response.ok && data.success) {
             localStorage.setItem('userPhone', phone);
             localStorage.setItem('userToken', data.token || '');
             localStorage.removeItem('tempPhone');
+            console.log('[SmartStock] OTP verified successfully');
             
             // Check if admin
             if (data.isAdmin) {
+                console.log('[SmartStock] Admin user, redirecting...');
                 localStorage.setItem('adminPhone', phone);
                 window.location.href = 'admin.html';
             } else {
+                console.log('[SmartStock] Regular user, loading products...');
                 const otpModal = bootstrap.Modal.getInstance(document.getElementById('otpModal'));
-                otpModal.hide();
+                if (otpModal) {
+                    otpModal.hide();
+                }
+                console.log('[SmartStock] Calling loadProducts()...');
                 loadProducts();
                 updateCartBadge();
+                console.log('[SmartStock] Login complete!');
             }
         } else {
+            console.error('[SmartStock] OTP verification failed:', data);
             alert('Invalid OTP. Demo OTP: 123456');
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('[SmartStock] Verify Error:', error);
         alert('Error: ' + error.message);
     }
 }
@@ -101,18 +126,33 @@ let allProducts = [];
 let selectedCategory = 'all';
 
 async function loadProducts(category = 'all') {
+    console.log('[SmartStock] loadProducts() called with category:', category);
     selectedCategory = category;
     const url = category === 'all' 
         ? `${API_BASE}/products` 
         : `${API_BASE}/products?category=${category}`;
 
+    console.log('[SmartStock] Fetching products from:', url);
     try {
         const response = await fetch(url);
+        console.log('[SmartStock] Products response status:', response.status);
+        
         if (response.ok) {
             allProducts = await response.json();
+            console.log('[SmartStock] Products loaded:', allProducts.length, 'items');
+            console.log('[SmartStock] First product:', allProducts[0]);
             displayProducts();
             loadCategories();
+            console.log('[SmartStock] Products displayed successfully');
+        } else {
+            console.error('[SmartStock] Products fetch failed with status:', response.status);
+            alert('Failed to load products. Status: ' + response.status);
         }
+    } catch (error) {
+        console.error('[SmartStock] Products Error:', error);
+        alert('Error loading products: ' + error.message);
+    }
+}
     } catch (error) {
         console.error('Error loading products:', error);
     }

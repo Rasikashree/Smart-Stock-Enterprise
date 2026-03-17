@@ -21,7 +21,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"phone\": \"9876543210\"\n}"
+              "raw": "{\n  \"phone\": \"9442290033\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/otp/send",
@@ -44,7 +44,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"phone\": \"9876543210\",\n  \"otp\": \"123456\"\n}"
+              "raw": "{\n  \"phone\": \"9442290033\",\n  \"otp\": \"123456\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/otp/verify",
@@ -122,7 +122,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"phone\": \"9876543210\",\n  \"productId\": 1,\n  \"quantity\": 2\n}"
+              "raw": "{\n  \"phone\": \"9442290033\",\n  \"productId\": 1,\n  \"quantity\": 2\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/cart/add",
@@ -146,7 +146,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"phone\": \"9876543210\",\n  \"productId\": 11,\n  \"quantity\": 1\n}"
+              "raw": "{\n  \"phone\": \"9442290033\",\n  \"productId\": 11,\n  \"quantity\": 1\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/cart/add",
@@ -163,7 +163,7 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "http://localhost:8080/api/cart?phone=9876543210",
+              "raw": "http://localhost:8080/api/cart?phone=9442290033",
               "protocol": "http",
               "host": ["localhost"],
               "port": "8080",
@@ -171,7 +171,7 @@
               "query": [
                 {
                   "key": "phone",
-                  "value": "9876543210"
+                  "value": "9442290033"
                 }
               ]
             }
@@ -220,7 +220,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"phone\": \"9876543210\",\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"qty\": 2\n    },\n    {\n      \"productId\": 2,\n      \"qty\": 1\n    }\n  ],\n  \"locks\": [1],\n  \"total\": 450.00\n}"
+              "raw": "{\n  \"phone\": \"9442290033\",\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"qty\": 2\n    },\n    {\n      \"productId\": 2,\n      \"qty\": 1\n    }\n  ],\n  \"locks\": [1],\n  \"total\": 450.00\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/orders",
@@ -248,7 +248,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"orderId\": 1,\n  \"amount\": 450.00,\n  \"phone\": \"9876543210\"\n}"
+              "raw": "{\n  \"orderId\": 1,\n  \"amount\": 450.00,\n  \"phone\": \"9442290033\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/payments/razorpay",

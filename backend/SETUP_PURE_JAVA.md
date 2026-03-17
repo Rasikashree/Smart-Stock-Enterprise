@@ -53,17 +53,17 @@ curl http://localhost:8080/api/products
 # Send OTP
 curl -X POST http://localhost:8080/api/otp/send `
   -H "Content-Type: application/json" `
-  -d '{"phone":"9876543210"}'
+  -d '{"phone":"9442290033"}'
 
 # Verify OTP (demo: 123456)
 curl -X POST http://localhost:8080/api/otp/verify `
  -H "Content-Type: application/json" `
-  -d '{"phone":"9876543210","otp":"123456"}'
+  -d '{"phone":"9442290033","otp":"123456"}'
 
 # Add to cart (smart locking)
 curl -X POST http://localhost:8080/api/cart/add `
   -H "Content-Type: application/json" `
-  -d '{"phone":"9876543210","productId":5,"quantity":1}'
+  -d '{"phone":"9442290033","productId":5,"quantity":1}'
 
 # Admin dashboard
 curl http://localhost:8080/api/admin/dashboard
@@ -141,7 +141,7 @@ python -m http.server 3000  # Requires Python
 
 3. **Test Full Flow**:
    - Open http://localhost:3000 or file:///path/to/frontend/index.html
-   - Login: Phone `9876543210`, OTP `123456`
+   - Login: Phone `9442290033`, OTP `123456`
    - Add products to cart
    - Test smart locking (items with stock < 10)
 

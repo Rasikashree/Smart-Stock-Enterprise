@@ -5,7 +5,7 @@
   <artifactId>smartstock-enterprise</artifactId>
   <name>SmartStock Enterprise Backend</name>
   <version>1.0.0</version>
-  <description>Pure Java Backend with Supabase PostgreSQL Integration</description>
+  <description>Pure Java Backend with MongoDB Atlas Integration</description>
   <build>
     <sourceDirectory>${basedir}</sourceDirectory>
     <plugins>

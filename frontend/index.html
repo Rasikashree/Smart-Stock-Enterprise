@@ -109,16 +109,26 @@
     <script src="script.js"></script>
     <script>
         // Auto-show login modal if not authenticated
+        console.log('[SmartStock] Page loading...');
         window.addEventListener('load', () => {
-            if (!localStorage.getItem('userPhone')) {
+            console.log('[SmartStock] Page loaded, checking authentication...');
+            const userPhone = localStorage.getItem('userPhone');
+            console.log('[SmartStock] User phone in localStorage:', userPhone);
+            
+            if (!userPhone) {
+                console.log('[SmartStock] No user found, showing OTP modal...');
                 const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
                 otpModal.show();
+                console.log('[SmartStock] OTP modal shown');
             } else {
-                loadCart();  // ← ADDED: Load cart from sessionStorage first
+                console.log('[SmartStock] User already logged in, loading data...');
+                loadCart();  // Load cart from sessionStorage first
                 loadProducts();
                 updateCartBadge();
+                console.log('[SmartStock] Data loading initiated');
             }
         });
+        console.log('[SmartStock] Initialization script loaded');
     </script>
 </body>
 </html>
