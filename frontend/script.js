@@ -2,7 +2,12 @@
 // API Base URL - auto-detects production vs local
 const API_BASE = (() => {
     const host = window.location.hostname;
-    // Running on Netlify or any non-localhost domain → use Render backend
+    // Running on Vercel (smartstock-enterprise-frontend)
+    if (host.includes('vercel.app') || host.includes('netlify.app')) {
+        // Vercel proxy backend → proxies to Java backend on Render.com
+        return 'https://smart-stock-enterprise-rasikashrees-projects.vercel.app/api';
+    }
+    // Any other non-localhost domain → direct Render backend
     if (host !== 'localhost' && host !== '127.0.0.1') {
         return 'https://smartstock-enterprise-backend.onrender.com/api';
     }
