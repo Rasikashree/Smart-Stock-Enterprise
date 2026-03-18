@@ -66,14 +66,61 @@ public class SmartStockBackend {
     //  CONFIG LOADER (.env)
     // =========================================================================
     private static void loadEnvConfig() {
-        File envFile = new File(".env");
-        if (!envFile.exists()) {
-            // Try one directory up (run from project root)
-            envFile = new File("backend/.env");
+        // ── Priority 1: OS / Docker / Cloud environment variables ──────────────
+        String envHost = System.getenv("DB_HOST");
+        String envPort = System.getenv("DB_PORT");
+        String envName = System.getenv("DB_NAME");
+        String envUser = System.getenv("DB_USER");
+        String envPass = System.getenv("DB_PASSWORD");
+        String envSrvPort = System.getenv("SERVER_PORT");
+        String envDbUrl = System.getenv("DB_URL"); // full jdbc URL shortcut
+
+        boolean envVarsFound = (envHost != null || envDbUrl != null);
+
+        if (envVarsFound) {
+            // Parse full JDBC URL if provided: jdbc:postgresql://host:port/db
+            if (envDbUrl != null && !envDbUrl.isEmpty()) {
+                try {
+                    // Remove jdbc: prefix if present
+                    String url = envDbUrl.startsWith("jdbc:postgresql://")
+                        ? envDbUrl.substring("jdbc:postgresql://".length())
+                        : envDbUrl.replace("postgresql://", "");
+                    // url = host:port/dbname or host/dbname
+                    String[] hostPart = url.split("/", 2);
+                    String[] hp = hostPart[0].split(":");
+                    DB_HOST = hp[0];
+                    if (hp.length > 1) DB_PORT = hp[1];
+                    if (hostPart.length > 1) {
+                        String dbPart = hostPart[1].split("\\?")[0]; // strip query params
+                        if (!dbPart.isEmpty()) DB_NAME = dbPart;
+                    }
+                } catch (Exception e) {
+                    System.out.println("⚠️  Could not parse DB_URL: " + e.getMessage());
+                }
+            }
+            if (envHost != null && !envHost.isEmpty())    DB_HOST     = envHost;
+            if (envPort != null && !envPort.isEmpty())    DB_PORT     = envPort;
+            if (envName != null && !envName.isEmpty())    DB_NAME     = envName;
+            if (envUser != null && !envUser.isEmpty())    DB_USER     = envUser;
+            if (envPass != null && !envPass.isEmpty())    DB_PASSWORD = envPass;
+            if (envSrvPort != null && !envSrvPort.isEmpty()) {
+                try { SERVER_PORT = Integer.parseInt(envSrvPort); } catch (Exception ignored) {}
+            }
+            System.out.println("✅ Config loaded from environment variables (cloud/Docker mode)");
+            System.out.println("   Host : " + DB_HOST);
+            System.out.println("   DB   : " + DB_NAME);
+            System.out.println("   User : " + DB_USER);
+            System.out.println("   Port : " + SERVER_PORT);
+            return;
         }
+
+        // ── Priority 2: .env file (local development) ──────────────────────────
+        File envFile = new File(".env");
+        if (!envFile.exists()) envFile = new File("backend/.env");
+
         if (!envFile.exists()) {
-            System.out.println("⚠️  .env file not found – using built-in defaults.");
-            System.out.println("   Create backend/.env and fill in your Supabase credentials.");
+            System.out.println("⚠️  No .env file and no environment variables found – using built-in defaults.");
+            System.out.println("   Set DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD env vars.");
             return;
         }
         try (BufferedReader br = new BufferedReader(new FileReader(envFile))) {
@@ -94,7 +141,7 @@ public class SmartStockBackend {
                     case "SERVER_PORT": SERVER_PORT = Integer.parseInt(value); break;
                 }
             }
-            System.out.println("✅ Config loaded from .env");
+            System.out.println("✅ Config loaded from .env file");
             System.out.println("   Host : " + DB_HOST);
             System.out.println("   DB   : " + DB_NAME);
             System.out.println("   User : " + DB_USER);

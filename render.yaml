@@ -1,5 +1,5 @@
 # ──────────────────────────────────────────────────────────────
-#  SmartStock Enterprise – Render.com Deployment Blueprint
+#  SmartStock Enterprise – Render.com Blueprint
 #  Docs: https://render.com/docs/blueprint-spec
 # ──────────────────────────────────────────────────────────────
 services:
@@ -8,12 +8,13 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
-    region: singapore     # closest to ap-south-1 (Mumbai)
+    region: singapore        # closest to ap-south-1 (Mumbai Supabase)
 
-    # Health check endpoint
+    # Health check
     healthCheckPath: /api/health
 
-    # Environment variables (sensitive ones set via Render dashboard)
+    # Environment variables
+    # NOTE: DB_PASSWORD must be set manually in Render Dashboard → Environment
     envVars:
       - key: DB_HOST
         value: aws-1-ap-south-1.pooler.supabase.com
@@ -24,6 +25,6 @@ services:
       - key: DB_USER
         value: postgres.iucuspicdbqutdphfamc
       - key: DB_PASSWORD
-        sync: false            # Will be set manually in Render dashboard
+        sync: false          # Set manually in Render Dashboard (keep secret!)
       - key: SERVER_PORT
         value: "8080"
