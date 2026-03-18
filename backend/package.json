@@ -1,0 +1,21 @@
+{
+  "name": "smartstock-enterprise-backend",
+  "version": "1.0.0",
+  "description": "SmartStock Enterprise Backend - Vercel Serverless Proxy to Render Java API",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js",
+    "dev": "node api/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^2.7.0",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["smartstock", "backend", "proxy", "vercel", "serverless"],
+  "author": "SmartStock Team",
+  "license": "MIT"
+}
